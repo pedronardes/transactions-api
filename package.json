@@ -1,12 +1,12 @@
 {
   "name": "transactions-api",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "repository": "https://github.com/pedronardes/transactions-api.git",
   "author": "mdama <mcafeesociety@gmail.com>",
   "license": "MIT",
-  "scripts":{
-    "dev": "nodemon src/index.js"
+  "scripts": {
+    "dev": "nodemon src/server.js"
   },
   "dependencies": {
     "express": "^4.17.1",
