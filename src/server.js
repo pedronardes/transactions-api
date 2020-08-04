@@ -8,13 +8,11 @@ app.use(express.json());
 const transactions = {
   transactions: [],
   balance: {
-    income: 800,
-    outcome: 300,
-    total: 500,
+    income: 0,
+    outcome: 0,
+    total: 0,
   },
 };
-
-const balance = [];
 
 function log(req, res, next) {
   const { method, url } = req;
@@ -39,6 +37,10 @@ function validateID(req, res, next) {
   next();
 }
 
+function validateIDAPP(req, res, next) {
+  console.log(111);
+}
+
 app.get("/transactions", (req, res) => {
   return res.json(transactions);
 });
@@ -49,6 +51,14 @@ app.post("/transactions", (req, res) => {
   const transaction = { id: uuid(), title, value, type };
 
   transactions.transactions.push(transaction);
+
+  if (type == "income") {
+    transactions.balance.income += value;
+    transactions.balance.total += value;
+  } else {
+    transactions.balance.outcome += value;
+    transactions.balance.total -= value;
+  }
 
   return res.json(transaction);
 });
