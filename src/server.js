@@ -5,18 +5,27 @@ const { uuid, isUuid } = require("uuidv4");
 
 app.use(express.json());
 
-const transactions = [];
+const transactions = {
+  transactions: [],
+  balance: {
+    income: 800,
+    outcome: 300,
+    total: 500,
+  },
+};
+
+const balance = [];
 
 function log(req, res, next) {
   const { method, url } = req;
 
-  const logLabel = `[${method.toUpperCase()}] ${url}`;
+  const logConsole = `[${method.toUpperCase()}] ${url}`;
 
-  console.time(logLabel);
+  console.time(logConsole);
 
   next();
 
-  console.timeEnd(logLabel);
+  console.timeEnd(logConsole);
 }
 
 app.use(log);
@@ -30,21 +39,21 @@ function validateID(req, res, next) {
   next();
 }
 
-app.get("/", (req, res) => {
+app.get("/transactions", (req, res) => {
   return res.json(transactions);
 });
 
-app.post("/", (req, res) => {
+app.post("/transactions", (req, res) => {
   const { title, value, type } = req.body;
 
   const transaction = { id: uuid(), title, value, type };
 
-  transactions.push(transaction);
+  transactions.transactions.push(transaction);
 
   return res.json(transaction);
 });
 
-app.put("/:id", validateID, (request, response) => {
+app.put("/transactions/:id", validateID, (request, response) => {
   const { id } = request.params;
   const { title, value, type } = request.body;
 
@@ -64,7 +73,7 @@ app.put("/:id", validateID, (request, response) => {
   return response.json(transaction);
 });
 
-app.delete("/:id", validateID, (req, res) => {
+app.delete("/transactions/:id", validateID, (req, res) => {
   const { id } = req.params;
 
   const transactionID = transactions.findIndex(
