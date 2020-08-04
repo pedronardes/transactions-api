@@ -1,11 +1,25 @@
 const express = require("express");
 const app = express();
 
-const { uuid } = require("uuidv4");
+const { uuid, isUuid } = require("uuidv4");
 
 app.use(express.json());
 
 const transactions = [];
+
+function log(req, res, next) {
+  const { method, url } = req;
+
+  const logLabel = `[${method.toUpperCase()}] ${url}`;
+
+  console.time(logLabel);
+
+  next();
+
+  console.timeEnd(logLabel);
+}
+
+app.use(log);
 
 function validateID(req, res, next) {
   const { id } = req.params;
@@ -15,8 +29,6 @@ function validateID(req, res, next) {
   }
   next();
 }
-
-app.use("/:id", validateID);
 
 app.get("/", (req, res) => {
   return res.json(transactions);
@@ -32,17 +44,13 @@ app.post("/", (req, res) => {
   return res.json(transaction);
 });
 
-app.put("/:id", (request, response) => {
+app.put("/:id", validateID, (request, response) => {
   const { id } = request.params;
   const { title, value, type } = request.body;
 
   const transactionIndex = transactions.findIndex(
     (transaction) => transaction.id == id
   );
-
-  if (transactionIndex < 0) {
-    return response.status(400).json({ error: "Project not found." });
-  }
 
   const transaction = {
     id,
@@ -56,16 +64,12 @@ app.put("/:id", (request, response) => {
   return response.json(transaction);
 });
 
-app.delete("/:id", (req, res) => {
+app.delete("/:id", validateID, (req, res) => {
   const { id } = req.params;
 
   const transactionID = transactions.findIndex(
     (transaction) => transaction.id == id
   );
-
-  if (transactionID < 0) {
-    return response.status(400).json({ error: "project not found." });
-  }
 
   transactions.splice(transactionID, 1);
 
